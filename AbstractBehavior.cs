@@ -92,6 +92,14 @@ namespace Hansoft.Jean.Behavior
         }
 
         /// <summary>
+        /// The logger that this behavior uses to log messages.
+        /// </summary>
+        public ILogger Logger
+        {
+            get { return logger; }
+        }
+
+        /// <summary>
         /// Indicates whether Jean for Hansoft is currently buffering events as specified with the EventWindow attribute of the Connection element in JeanSettings.xml
         /// </summary>
         public bool BufferedEvents
@@ -175,6 +183,29 @@ namespace Hansoft.Jean.Behavior
         /// </summary>
         /// <param name="e">The details of the event.</param>
         public virtual void OnTaskMove(TaskMoveEventArgs e) { }
+
+        /// <summary>
+        /// This function is internal to the Jean for Hansoft framework and should not be called directly.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void OnDataHistoryReceived(object sender, DataHistoryReceivedEventArgs e)
+        {
+            try
+            {
+                OnDataHistoryReceived(e);
+            }
+            catch (Exception ex)
+            {
+                logger.Exception("Error proccessing DataHistoryReceived for behavior " + Title + ".", ex);
+            }
+        }
+
+        /// <summary>
+        /// Override this function in subclasses to handle DataHistoryReceived events.
+        /// </summary>
+        /// <param name="e">The details of the event.</param>
+        public virtual void OnDataHistoryReceived(DataHistoryReceivedEventArgs e) { }
 
         /// <summary>
         /// This function is internal to the Jean for Hansoft framework and should not be called directly.

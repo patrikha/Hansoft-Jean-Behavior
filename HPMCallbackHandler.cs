@@ -65,6 +65,24 @@ namespace Hansoft.Jean.Behavior
     }
 
     /// <summary>
+    /// EventArgs subclass for Hansoft DataHistoryReceived events
+    /// </summary>
+    public class DataHistoryReceivedEventArgs : EventArgs
+    {
+        private HPMChangeCallbackData_DataHistoryReceived data;
+
+        internal DataHistoryReceivedEventArgs(HPMChangeCallbackData_DataHistoryReceived data)
+        {
+            this.data = data;
+        }
+
+        /// <summary>
+        /// The detailed event data.
+        /// </summary>
+        public HPMChangeCallbackData_DataHistoryReceived Data { get { return data; } }
+    }
+
+    /// <summary>
     /// EventArgs subclass for Hansoft TaskCreate events
     /// </summary>
     public class TaskCreateEventArgs : EventArgs
@@ -157,6 +175,12 @@ namespace Hansoft.Jean.Behavior
         /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
         /// To handle events you should create a subclass of AbstractBehvaior and override the relevant handling methods.
         /// </summary>
+        public event EventHandler<DataHistoryReceivedEventArgs> DataHistoryReceived;
+
+        /// <summary>
+        /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
+        /// To handle events you should create a subclass of AbstractBehvaior and override the relevant handling methods.
+        /// </summary>
         public event EventHandler<ProcessErrorEventArgs> ProcessError;
 
         /// <summary>
@@ -226,6 +250,11 @@ namespace Hansoft.Jean.Behavior
                         {
                             if (TaskMove != null)
                                 TaskMove(this, (TaskMoveEventArgs)e);
+                        }
+                        else if (e is DataHistoryReceivedEventArgs)
+                        {
+                            if (DataHistoryReceived != null)
+                                DataHistoryReceived(this, (DataHistoryReceivedEventArgs)e);
                         }
                     }
                     if (EndProcessBufferedEvents != null)
@@ -368,6 +397,27 @@ namespace Hansoft.Jean.Behavior
             {
                 if (TaskMove != null)
                     TaskMove(this, new TaskMoveEventArgs(_Data));
+            }
+        }
+
+        /// <summary>
+        /// This function is internal to the Jean for Hansoft framework and should not be called directly.
+        /// </summary>
+        /// <param name="_Data">The detailed information of the change.</param>
+        public override void On_DataHistoryReceived(HPMChangeCallbackData_DataHistoryReceived _Data)
+        {
+            base.On_DataHistoryReceived(_Data);
+            if (BufferEvents)
+            {
+                lock (eventBuffer)
+                {
+                    eventBuffer.Add(new DataHistoryReceivedEventArgs(_Data));
+                }
+            }
+            else
+            {
+                if (DataHistoryReceived != null)
+                    DataHistoryReceived(this, new DataHistoryReceivedEventArgs(_Data));
             }
         }
 
