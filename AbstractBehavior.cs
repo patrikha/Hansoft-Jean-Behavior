@@ -212,23 +212,23 @@ namespace Hansoft.Jean.Behavior
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void OnTimesheetGetDateRangeResponse(object sender, TimesheetGetDateRangeResponseEventArgs e)
+        public void OnProjectCreate(object sender, ProjectCreateEventArgs e)
         {
             try
             {
-                OnTimesheetGetDateRangeResponse(e);
+                OnProjectCreate(e);
             }
             catch (Exception ex)
             {
-                logger.Exception("Error proccessing TimesheetGetDateRangeResponse for behavior " + Title + ".", ex);
+                logger.Exception("Error proccessing ProjectCreate for behavior " + Title + ".", ex);
             }
         }
 
         /// <summary>
-        /// Override this function in subclasses to handle TimesheetGetDateRangeResponse events.
+        /// Override this function in subclasses to handle ProjectCreate events.
         /// </summary>
         /// <param name="e">The details of the event.</param>
-        public virtual void OnTimesheetGetDateRangeResponse(TimesheetGetDateRangeResponseEventArgs e) { }
+        public virtual void OnProjectCreate(ProjectCreateEventArgs e) { }
 
         /// <summary>
         /// This function is internal to the Jean for Hansoft framework and should not be called directly.
@@ -275,30 +275,6 @@ namespace Hansoft.Jean.Behavior
         /// </summary>
         /// <param name="e">The details of the event.</param>
         public virtual void OnTaskCreate(TaskCreateEventArgs e) { }
-
-
-        /// <summary>
-        /// This function is internal to the Jean for Hansoft framework and should not be called directly.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void OnTimesheetRowChange(object sender, TimesheetRowChangeEventArgs e)
-        {
-            try
-            {
-                OnTimesheetRowChange(e);
-            }
-            catch (Exception ex)
-            {
-                logger.Exception("Error proccessing TimesheetRowChangeEvent for behavior " + Title + ".", ex);
-            }
-        }
-
-        /// <summary>
-        /// Override this function in subclasses to handle TimesheetRowChange events.
-        /// </summary>
-        /// <param name="e">The details of the event.</param>
-        public virtual void OnTimesheetRowChange(TimesheetRowChangeEventArgs e) { }
 
         /// <summary>
         /// This function is internal to the Jean for Hansoft framework and should not be called directly.

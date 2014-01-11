@@ -83,13 +83,13 @@ namespace Hansoft.Jean.Behavior
     }
     
     /// <summary>
-    /// EventArgs subclass for Hansoft TimesheetGetDateRangeResponse events
+    /// EventArgs subclass for Hansoft ProjectCreate events
     /// </summary>
-    public class TimesheetGetDateRangeResponseEventArgs : EventArgs
+    public class ProjectCreateEventArgs : EventArgs
     {
-        private HPMChangeCallbackData_TimesheetGetDateRangeResponse data;
+        private HPMChangeCallbackData_ProjectCreate data;
 
-        internal TimesheetGetDateRangeResponseEventArgs(HPMChangeCallbackData_TimesheetGetDateRangeResponse data)
+        internal ProjectCreateEventArgs(HPMChangeCallbackData_ProjectCreate data)
         {
             this.data = data;
         }
@@ -97,7 +97,7 @@ namespace Hansoft.Jean.Behavior
         /// <summary>
         /// The detailed event data.
         /// </summary>
-        public HPMChangeCallbackData_TimesheetGetDateRangeResponse Data { get { return data; } }
+        public HPMChangeCallbackData_ProjectCreate Data { get { return data; } }
     }
 
     /// <summary>
@@ -134,24 +134,6 @@ namespace Hansoft.Jean.Behavior
         /// The detailed event data.
         /// </summary>
         public HPMChangeCallbackData_TaskDelete Data { get { return data; } }
-    }
-
-    /// <summary>
-    /// EventArgs subclass for Hansoft TimesheetRowChange events
-    /// </summary>
-    public class TimesheetRowChangeEventArgs : EventArgs
-    {
-        private HPMChangeCallbackData_TimesheetRowChange data;
-
-        internal TimesheetRowChangeEventArgs(HPMChangeCallbackData_TimesheetRowChange data)
-        {
-            this.data = data;
-        }
-
-        /// <summary>
-        /// The detailed event data.
-        /// </summary>
-        public HPMChangeCallbackData_TimesheetRowChange Data { get { return data; } }
     }
 
     /// <summary>
@@ -211,19 +193,19 @@ namespace Hansoft.Jean.Behavior
         /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
         /// To handle events you should create a subclass of AbstractBehvaior and override the relevant handling methods.
         /// </summary>
-        public event EventHandler<TimesheetRowChangeEventArgs> TimesheetRowChange;
+        public event EventHandler<ProjectCreateEventArgs> ProjectCreate;
+
+        /// <summary>
+        /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
+        /// To handle events you should create a subclass of AbstractBehvaior and override the relevant handling methods.
+        /// </summary>
+        public event EventHandler<EventArgs> ProjectCreateCompleted;
 
         /// <summary>
         /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
         /// To handle events you should create a subclass of AbstractBehvaior and override the relevant handling methods.
         /// </summary>
         public event EventHandler<DataHistoryReceivedEventArgs> DataHistoryReceived;
-
-        /// <summary>
-        /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
-        /// To handle events you should create a subclass of AbstractBehvaior and override the relevant handling methods.
-        /// </summary>
-        public event EventHandler<TimesheetGetDateRangeResponseEventArgs> TimesheetGetDateRangeResponse;
 
         /// <summary>
         /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
@@ -299,20 +281,17 @@ namespace Hansoft.Jean.Behavior
                             if (TaskMove != null)
                                 TaskMove(this, (TaskMoveEventArgs)e);
                         }
-                        else if (e is TimesheetRowChangeEventArgs)
+                        else if (e is ProjectCreateEventArgs)
                         {
-                            if (TimesheetRowChange != null)
-                                TimesheetRowChange(this, (TimesheetRowChangeEventArgs)e);
+                            if (ProjectCreate != null)
+                                ProjectCreate(this, (ProjectCreateEventArgs)e);
+                            if (ProjectCreateCompleted != null)
+                                ProjectCreateCompleted(this, new EventArgs());
                         }
                         else if (e is DataHistoryReceivedEventArgs)
                         {
                             if (DataHistoryReceived != null)
                                 DataHistoryReceived(this, (DataHistoryReceivedEventArgs)e);
-                        }
-                        else if (e is TimesheetGetDateRangeResponseEventArgs)
-                        {
-                            if (TimesheetGetDateRangeResponse != null)
-                                TimesheetGetDateRangeResponse(this, (TimesheetGetDateRangeResponseEventArgs)e);
                         }
                     }
                     if (EndProcessBufferedEvents != null)
@@ -413,24 +392,33 @@ namespace Hansoft.Jean.Behavior
             }
         }
 
+        /*
+        public override void On_VersionControlSyncFilesResponse(HPMChangeCallbackData_VersionControlSyncFilesResponse _Data)
+        {
+            base.On_VersionControlSyncFilesResponse(_Data);
+        }
+        */
+
         /// <summary>
         /// This function is internal to the Jean for Hansoft framework and should not be called directly.
         /// </summary>
         /// <param name="_Data">The detailed information of the change.</param>
-        public override void On_TimesheetRowChange(HPMChangeCallbackData_TimesheetRowChange _Data)
+        public override void On_ProjectCreate(HPMChangeCallbackData_ProjectCreate _Data)
         {
-            base.On_TimesheetRowChange(_Data);
+            base.On_ProjectCreate(_Data);
             if (BufferEvents)
             {
                 lock (eventBuffer)
                 {
-                    eventBuffer.Add(new TimesheetRowChangeEventArgs(_Data));
+                    eventBuffer.Add(new ProjectCreateEventArgs(_Data));
                 }
             }
             else
             {
-                if (TimesheetRowChange != null)
-                    TimesheetRowChange(this, new TimesheetRowChangeEventArgs(_Data));
+                if (ProjectCreate != null)
+                    ProjectCreate(this, new ProjectCreateEventArgs(_Data));
+                if (ProjectCreateCompleted != null)
+                    ProjectCreateCompleted(this, new EventArgs());
             }
         }
 
@@ -498,27 +486,6 @@ namespace Hansoft.Jean.Behavior
             {
                 if (DataHistoryReceived != null)
                     DataHistoryReceived(this, new DataHistoryReceivedEventArgs(_Data));
-            }
-        }
-
-        /// <summary>
-        /// This function is internal to the Jean for Hansoft framework and should not be called directly.
-        /// </summary>
-        /// <param name="_Data">The detailed information of the change.</param>
-        public override void On_TimesheetGetDateRangeResponse(HPMChangeCallbackData_TimesheetGetDateRangeResponse _Data)
-        {
-            base.On_TimesheetGetDateRangeResponse(_Data);
-            if (BufferEvents)
-            {
-                lock (eventBuffer)
-                {
-                    eventBuffer.Add(new TimesheetGetDateRangeResponseEventArgs(_Data));
-                }
-            }
-            else
-            {
-                if (TimesheetGetDateRangeResponse != null)
-                    TimesheetGetDateRangeResponse(this, new TimesheetGetDateRangeResponseEventArgs(_Data));
             }
         }
 
