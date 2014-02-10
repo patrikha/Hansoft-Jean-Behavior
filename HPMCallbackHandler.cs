@@ -81,7 +81,7 @@ namespace Hansoft.Jean.Behavior
         /// </summary>
         public HPMChangeCallbackData_DataHistoryReceived Data { get { return data; } }
     }
-    
+
     /// <summary>
     /// EventArgs subclass for Hansoft ProjectCreate events
     /// </summary>
@@ -98,6 +98,24 @@ namespace Hansoft.Jean.Behavior
         /// The detailed event data.
         /// </summary>
         public HPMChangeCallbackData_ProjectCreate Data { get { return data; } }
+    }
+
+    /// <summary>
+    /// EventArgs subclass for Hansoft ProjectDelete events
+    /// </summary>
+    public class ProjectDeleteEventArgs : EventArgs
+    {
+        private HPMChangeCallbackData_ProjectDelete data;
+
+        internal ProjectDeleteEventArgs(HPMChangeCallbackData_ProjectDelete data)
+        {
+            this.data = data;
+        }
+
+        /// <summary>
+        /// The detailed event data.
+        /// </summary>
+        public HPMChangeCallbackData_ProjectDelete Data { get { return data; } }
     }
 
     /// <summary>
@@ -195,11 +213,24 @@ namespace Hansoft.Jean.Behavior
         /// </summary>
         public event EventHandler<ProjectCreateEventArgs> ProjectCreate;
 
+
+        /// <summary>
+        /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
+        /// To handle events you should create a subclass of AbstractBehvaior and override the relevant handling methods.
+        /// </summary>
+        public event EventHandler<ProjectDeleteEventArgs> ProjectDelete;
+
         /// <summary>
         /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
         /// To handle events you should create a subclass of AbstractBehvaior and override the relevant handling methods.
         /// </summary>
         public event EventHandler<EventArgs> ProjectCreateCompleted;
+
+        /// <summary>
+        /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
+        /// To handle events you should create a subclass of AbstractBehvaior and override the relevant handling methods.
+        /// </summary>
+        public event EventHandler<EventArgs> ProjectDeleteCompleted;
 
         /// <summary>
         /// This event handler is internal to the Jean for Hansoft framework and you should not hook up to it directly.
@@ -287,6 +318,13 @@ namespace Hansoft.Jean.Behavior
                                 ProjectCreate(this, (ProjectCreateEventArgs)e);
                             if (ProjectCreateCompleted != null)
                                 ProjectCreateCompleted(this, new EventArgs());
+                        }
+                        else if (e is ProjectDeleteEventArgs)
+                        {
+                            if (ProjectDelete != null)
+                                ProjectDelete(this, (ProjectDeleteEventArgs)e);
+                            if (ProjectDeleteCompleted != null)
+                                ProjectDeleteCompleted(this, new EventArgs());
                         }
                         else if (e is DataHistoryReceivedEventArgs)
                         {
@@ -398,6 +436,25 @@ namespace Hansoft.Jean.Behavior
             base.On_VersionControlSyncFilesResponse(_Data);
         }
         */
+
+        public override void On_ProjectDelete(HPMChangeCallbackData_ProjectDelete _Data)
+        {
+            base.On_ProjectDelete(_Data);
+            if (BufferEvents)
+            {
+                lock (eventBuffer)
+                {
+                    eventBuffer.Add(new ProjectDeleteEventArgs(_Data));
+                }
+            }
+            else
+            {
+                if (ProjectDelete != null)
+                    ProjectDelete(this, new ProjectDeleteEventArgs(_Data));
+                if (ProjectDeleteCompleted != null)
+                    ProjectDeleteCompleted(this, new EventArgs());
+            }
+        }
 
         /// <summary>
         /// This function is internal to the Jean for Hansoft framework and should not be called directly.
