@@ -60,6 +60,29 @@ namespace Hansoft.Jean.Behavior
         }
 
         /// <summary>
+        /// Returns the view type based on string value
+        /// </summary>
+        /// <param name="viewType">View type as string</param>
+        /// <returns>The correspronding EHPMReportViewType, throws ArgumentException if no match is found</returns>
+        public EHPMReportViewType GetViewType(string viewType)
+        {
+            switch (viewType)
+            {
+                case ("Agile"):
+                    return EHPMReportViewType.AgileMainProject;
+                case ("Scheduled"):
+                    return EHPMReportViewType.ScheduleMainProject;
+                case ("Bugs"):
+                    return EHPMReportViewType.AllBugsInProject;
+                case ("Backlog"):
+                    return EHPMReportViewType.AgileBacklog;
+                default:
+                    throw new ArgumentException("Unsupported View Type: " + viewType);
+
+            }
+        }
+
+        /// <summary>
         /// This method is internal to the Jean for Hansoft framework and should not be called directly.
         /// </summary>
         /// <param name="bufferedEvents">Indicates whether events should be buffered or not.</param>
